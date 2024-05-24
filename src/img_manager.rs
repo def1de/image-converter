@@ -1,5 +1,6 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
+use image;
 
 const IMAGES: [&str; 15] = [
     "jpg",
@@ -19,8 +20,8 @@ const IMAGES: [&str; 15] = [
     "webp",
 ];
 
-pub fn is_image_extension(extension: &str) -> bool {
-    IMAGES.contains(&extension)
+pub fn is_image_extension(file_ext: String) -> bool {
+    return IMAGES.contains(&file_ext.to_lowercase().as_str());
 }
 
 pub fn create_app_buttons(vbox: &gtk::Box) {
