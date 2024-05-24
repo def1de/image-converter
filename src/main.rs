@@ -68,7 +68,7 @@ fn main() -> glib::ExitCode{
 
         // Check if the input file is a supported file format
         if img_manager::is_image_extension(file.ext) {
-            img_manager::create_app_buttons(&vbox);
+            img_manager::create_app_buttons(&vbox, file.path.clone());
         } else {
             let error_text = gtk::Label::builder()
                 .label("This file format is not supported")
