@@ -1,8 +1,10 @@
 #![windows_subsystem = "windows"]
+#![allow(unused)]
 
 use gtk4 as gtk;
 use gtk::prelude::*;
-use gtk::{glib, Application, ApplicationWindow, Button};
+use gtk::{glib, Application, ApplicationWindow};
+use gtk::{Box, Orientation};
 
 fn convert_image(input_file: String, ext: &str) {
     // Get the name of the image file
@@ -41,16 +43,33 @@ fn main() -> glib::ExitCode{
     application.connect_activate(|app| {
         let window = ApplicationWindow::builder()
             .application(app)
-            .title("First GTK Program")
+            .title("Cross Convert")
             .default_width(350)
             .default_height(70)
             .build();
 
-        let button = Button::with_label("Click me!");
-        button.connect_clicked(|_| {
-            eprintln!("Clicked!");
-        });
-        window.set_child(Some(&button));
+        let vbox = Box::builder().orientation(Orientation::Vertical)
+        .margin_top(20)
+        .margin_bottom(20)
+        .margin_start(20)
+        .margin_end(20)
+        .build();
+        window.set_child(Some(&vbox));
+
+        let title_text = gtk::Label::builder()
+            .label("Select the format to convert the image to:")
+            .margin_bottom(12)
+            .build();
+        vbox.append(&title_text);
+
+        for i in 1..10 {
+            let button_label = format!("Button {}", i);
+            let button = gtk::Button::builder().label(&button_label).margin_bottom(12).build();
+            button.connect_clicked(move |_| {
+                println!("Clicked! {}", &button_label);
+            });
+            vbox.append(&button);
+        }
 
         window.present();
     });
