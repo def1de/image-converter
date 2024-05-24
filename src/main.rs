@@ -1,29 +1,12 @@
 #![windows_subsystem = "windows"]
 #![allow(unused)]
 
+mod img_manager;
+
 use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow};
 use gtk::{Box, Orientation};
-
-fn convert_image(input_file: String, ext: &str) {
-    // Get the name of the image file
-    let new_file_path: &str = input_file.split(".").collect::<Vec<&str>>()[0];
-    let new_path = new_file_path.to_owned() + ext;
-
-    // Open the image file
-    match image::open(&input_file) {
-        Ok(img) => {
-            let img = img.to_rgba8();
-            // Save the image file with required extension
-            match img.save(new_path) {
-                Ok(_) => {}
-                Err(_) => {}
-            }
-        }
-        Err(_) => {}
-    };
-}
 
 fn main() -> glib::ExitCode{
     // Get the command line arguments
@@ -62,14 +45,7 @@ fn main() -> glib::ExitCode{
             .build();
         vbox.append(&title_text);
 
-        for i in 1..10 {
-            let button_label = format!("Button {}", i);
-            let button = gtk::Button::builder().label(&button_label).margin_bottom(12).build();
-            button.connect_clicked(move |_| {
-                println!("Clicked! {}", &button_label);
-            });
-            vbox.append(&button);
-        }
+        img_manager::create_app_buttons(&vbox);
 
         window.present();
     });
