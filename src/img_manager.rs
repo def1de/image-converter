@@ -1,17 +1,14 @@
 use gtk4 as gtk;
 use gtk::prelude::*;
 use image;
+use std::io::Error;
+use std::sync::{Arc, Mutex};
 
-const IMAGES: [&str; 15] = [
+const IMAGES: [&str; 10] = [
     "jpg",
     "avif",
     "bmp",
-    "dds",
     "gif",
-    "hdr",
-    "ico",
-    "jpeg",
-    "exr",
     "png",
     "pnm",
     "qoi",
@@ -24,20 +21,29 @@ pub fn is_image_extension(file_ext: String) -> bool {
     IMAGES.contains(&file_ext.to_lowercase().as_str())
 }
 
-pub fn create_app_buttons(vbox: &gtk::Box, input_file: String) {
+pub fn create_app_buttons(vbox: &gtk::Box, input_file: String) -> Result<(), Error> {
     println!("Creating buttons");
+    let buttons: Arc<Mutex<Vec<gtk::Button>>> = Arc::new(Mutex::new(Vec::new()));
     for i in 0..IMAGES.len() {
         let button_label = format!("Convert to .{}", IMAGES[i]);
         let button = gtk::Button::builder().label(&button_label).margin_bottom(12).build();
         let input = input_file.clone();
+        let mut buttons = buttons.lock().unwrap();
+        buttons.push(button.clone());
         button.connect_clicked(move |_| {
-            convert_image(input.clone(), &format!(".{}", IMAGES[i]));
-        }); 
+            if let Err(_) = convert_image(input.clone(), &format!(".{}", IMAGES[i])) {
+                let iter = buttons.clone();
+                for button in iter {
+                    vbox.remove(button);
+                }
+            }
+        });
         vbox.append(&button);
     }
+    Ok(())
 }
 
-fn convert_image(input_file: String, ext: &str) {
+fn convert_image(input_file: String, ext: &str) -> Result<(), Error>{
     // Get the name of the image file
     println!("Converting image");
     let new_file_path: &str = input_file.split(".").collect::<Vec<&str>>()[0];
@@ -49,10 +55,10 @@ fn convert_image(input_file: String, ext: &str) {
             let img = img.to_rgba8();
             // Save the image file with required extension
             match img.save(new_path) {
-                Ok(_) => {}
-                Err(e) => {println!("Error saving image {}", e.to_string())}
+                Ok(_) => return Ok(()),
+                Err(e) => {return Err(Error::new(std::io::ErrorKind::Other, "Error reading image file"));}
             }
         }
-        Err(_) => {println!("Error opening image")}
+        Err(e) => {return Err(Error::new(std::io::ErrorKind::Other, "Error opening image file"));}
     };
 }

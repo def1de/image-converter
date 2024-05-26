@@ -33,7 +33,7 @@ fn get_file_path() -> File {
 }
 
 fn main() -> glib::ExitCode{
-
+    
     let application = Application::builder()
         .application_id("com.def1de.CrossConvert")
         .flags(ApplicationFlags::HANDLES_OPEN)
