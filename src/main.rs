@@ -3,6 +3,8 @@
 
 mod img_manager;
 
+use std::time::Duration;
+
 use gtk4 as gtk;
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow, gio::ApplicationFlags};
@@ -66,7 +68,6 @@ fn main() -> glib::ExitCode{
             .build();
         vbox.append(&title_text);
 
-        // Check if the input file is a supported file format
         if img_manager::is_image_extension(file.ext) {
             img_manager::create_app_buttons(&vbox, file.path.clone());
         } else {
@@ -76,7 +77,6 @@ fn main() -> glib::ExitCode{
                 .build();
             vbox.append(&error_text);
         }
-
         window.present();
     });
 

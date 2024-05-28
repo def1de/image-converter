@@ -4,7 +4,7 @@ use image;
 use std::io::Error;
 use std::sync::{Arc, Mutex};
 
-const IMAGES: [&str; 10] = [
+const IMAGES: [&str; 11] = [
     "jpg",
     "avif",
     "bmp",
@@ -15,6 +15,7 @@ const IMAGES: [&str; 10] = [
     "tga",
     "tiff",
     "webp",
+    "ico"
 ];
 
 pub fn is_image_extension(file_ext: String) -> bool {
@@ -23,19 +24,17 @@ pub fn is_image_extension(file_ext: String) -> bool {
 
 pub fn create_app_buttons(vbox: &gtk::Box, input_file: String) -> Result<(), Error> {
     println!("Creating buttons");
-    let buttons: Arc<Mutex<Vec<gtk::Button>>> = Arc::new(Mutex::new(Vec::new()));
     for i in 0..IMAGES.len() {
         let button_label = format!("Convert to .{}", IMAGES[i]);
         let button = gtk::Button::builder().label(&button_label).margin_bottom(12).build();
         let input = input_file.clone();
-        let mut buttons = buttons.lock().unwrap();
-        buttons.push(button.clone());
+        let vbox_clone = vbox.clone();
         button.connect_clicked(move |_| {
-            if let Err(_) = convert_image(input.clone(), &format!(".{}", IMAGES[i])) {
-                let iter = buttons.clone();
-                for button in iter {
-                    vbox.remove(button);
-                }
+            if let Err(_) = convert_image(input.clone(), &format!(".{}", IMAGES[i])){
+                let label = gtk::Label::builder().label("Error Saving Image").build();
+                vbox_clone.append(&label);     
+            } else {
+                std::process::exit(0);
             }
         });
         vbox.append(&button);
