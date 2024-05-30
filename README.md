@@ -16,4 +16,9 @@
 
 ---
 ## Usage
-For manual use `path/to/executable path/to/image`
+### For manual use
+- open terminal
+- use `path/to/executable path/to/file`
+### For use from menu
+- Right click on a file you want to convert
+- Choose your desired format you want to convert into
