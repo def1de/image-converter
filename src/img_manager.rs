@@ -32,7 +32,7 @@ pub fn create_app_buttons(vbox: &gtk::Box, input_file: String) -> Result<(), Err
         button.connect_clicked(move |_| {
             if let Err(_) = convert_image(input.clone(), &format!(".{}", IMAGES[i])){
                 let label = gtk::Label::builder().label("Error Saving Image").build();
-                vbox_clone.append(&label);     
+                vbox_clone.append(&label);
             } else {
                 std::process::exit(0);
             }
