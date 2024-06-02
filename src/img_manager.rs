@@ -26,7 +26,7 @@ pub fn convert_image(input_file: String, ext: &str) -> Result<(), Error> {
                 Err(e) => {
                     return Err(Error::new(
                         std::io::ErrorKind::Other,
-                        "Error reading image file",
+                        format!("Error reading image file {}", input_file),
                     ));
                 }
             }
@@ -34,7 +34,7 @@ pub fn convert_image(input_file: String, ext: &str) -> Result<(), Error> {
         Err(e) => {
             return Err(Error::new(
                 std::io::ErrorKind::Other,
-                "Error opening image file",
+                format!("Error opening image file: {}", input_file),
             ));
         }
     };
