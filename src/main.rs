@@ -1,17 +1,11 @@
 #![windows_subsystem = "windows"]
-#![allow(unused)]
 
 mod img_manager;
-use img_manager::{convert_image, is_image_extension};
+use img_manager::{convert_image, is_image_extension, Format};
 
 use iced::widget::{button, column, text, Column};
-use std::time::Duration;
 
-#[derive(Debug, Clone, Copy)]
-enum Format {
-    PNG,
-}
-
+#[derive(Debug, Clone)]
 struct Converter {
     result: String,
     file: File,
@@ -20,23 +14,31 @@ struct Converter {
 impl Converter {
     fn view(&self) -> Column<Format> {
         let title = text("Choose a file extention");
-        let btn_png = button(".PNG").on_press(Format::PNG);
+        let mut btn_col = column![];
+        for format in Format::values() {
+            let btn = button(format.as_str()).on_press(format);
+            btn_col = btn_col.push(btn);
+        }
+
         let debug = text(&self.result);
 
-        let interface = column![title, btn_png, debug];
+        let interface = column![title, btn_col, debug];
         interface
     }
 
     fn update(&mut self, format: Format) {
         self.file = get_file_path();
-        match format {
-            Format::PNG => match convert_image(self.file.path.clone(), ".png") {
-                Ok(_) => {
-                    self.result = "Image converted successfully".to_string();
-                    std::process::exit(0);
-                }
-                Err(e) => self.result = format!("Error converting image: {:?}", e),
-            },
+        if !is_image_extension(&self.file.ext) {
+            self.result = "Invalid file extension".to_string();
+            return;
+        }
+        match convert_image(self.file.path.clone(), format.as_str()) {
+            Ok(_) => {
+                self.result = "Image converted successfully".to_string();
+            }
+            Err(e) => {
+                self.result = format!("Error converting image: {}", e);
+            }
         }
     }
 }
@@ -53,6 +55,7 @@ impl Default for Converter {
     }
 }
 
+#[derive(Debug, Clone)]
 struct File {
     path: String,
     ext: String,
@@ -91,14 +94,5 @@ fn app() -> iced::Result {
 }
 
 fn main() {
-    let file = get_file_path();
-    if is_image_extension(file.ext) {
-        app();
-        // match convert_image(file.path, ".png") {
-        //     Ok(_) => println!("Image converted successfully"),
-        //     Err(e) => println!("Error converting image: {:?}", e),
-        // }
-    } else {
-        println!("Invalid image file extension");
-    }
+    let _ = app();
 }

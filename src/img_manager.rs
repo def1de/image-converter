@@ -1,13 +1,70 @@
 use image;
 use std::io::Error;
-use std::sync::{Arc, Mutex};
 
-const IMAGES: [&str; 11] = [
-    "jpg", "avif", "bmp", "gif", "png", "pnm", "qoi", "tga", "tiff", "webp", "ico",
-];
+#[derive(Debug, Clone)]
+pub enum Format {
+    JPG,
+    AVIF,
+    BMP,
+    GIF,
+    PNG,
+    QOI,
+    TGA,
+    TIFF,
+    WEBP,
+}
 
-pub fn is_image_extension(file_ext: String) -> bool {
-    IMAGES.contains(&file_ext.to_lowercase().as_str())
+impl Format {
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Format::JPG => ".jpg",
+            Format::AVIF => ".avif",
+            Format::BMP => ".bmp",
+            Format::GIF => ".gif",
+            Format::PNG => ".png",
+            Format::QOI => ".qoi",
+            Format::TGA => ".tga",
+            Format::TIFF => ".tiff",
+            Format::WEBP => ".webp",
+        }
+    }
+
+    pub fn from_str(format: &str) -> Option<Format> {
+        match format {
+            "jpg" => Some(Format::JPG),
+            "avif" => Some(Format::AVIF),
+            "bmp" => Some(Format::BMP),
+            "gif" => Some(Format::GIF),
+            "png" => Some(Format::PNG),
+            "qoi" => Some(Format::QOI),
+            "tga" => Some(Format::TGA),
+            "tiff" => Some(Format::TIFF),
+            "webp" => Some(Format::WEBP),
+            _ => None,
+        }
+    }
+
+    pub fn values() -> Vec<Format> {
+        vec![
+            Format::JPG,
+            Format::AVIF,
+            Format::BMP,
+            Format::GIF,
+            Format::PNG,
+            Format::QOI,
+            Format::TGA,
+            Format::TIFF,
+            Format::WEBP,
+        ]
+    }
+}
+
+pub fn is_image_extension(file_ext: &String) -> bool {
+    let format = Format::from_str(file_ext);
+    match format {
+        Some(_) => true,
+        None => false,
+    }
 }
 
 pub fn convert_image(input_file: String, ext: &str) -> Result<(), Error> {
@@ -19,14 +76,14 @@ pub fn convert_image(input_file: String, ext: &str) -> Result<(), Error> {
     // Open the image file
     match image::open(&input_file) {
         Ok(img) => {
-            let img = img.to_rgba8();
+            let img = img.to_rgb8();
             // Save the image file with required extension
             match img.save(new_path) {
                 Ok(_) => return Ok(()),
                 Err(e) => {
                     return Err(Error::new(
                         std::io::ErrorKind::Other,
-                        format!("Error reading image file {}", input_file),
+                        format!("Error reading image file {}\n{}", input_file, e),
                     ));
                 }
             }
@@ -34,7 +91,7 @@ pub fn convert_image(input_file: String, ext: &str) -> Result<(), Error> {
         Err(e) => {
             return Err(Error::new(
                 std::io::ErrorKind::Other,
-                format!("Error opening image file: {}", input_file),
+                format!("Error opening image file: {}\n{}", input_file, e),
             ));
         }
     };
