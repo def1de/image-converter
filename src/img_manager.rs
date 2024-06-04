@@ -1,48 +1,73 @@
-use gtk4 as gtk;
-use gtk::prelude::*;
 use image;
 use std::io::Error;
-use std::sync::{Arc, Mutex};
 
-const IMAGES: [&str; 11] = [
-    "jpg",
-    "avif",
-    "bmp",
-    "gif",
-    "png",
-    "pnm",
-    "qoi",
-    "tga",
-    "tiff",
-    "webp",
-    "ico"
-];
-
-pub fn is_image_extension(file_ext: String) -> bool {
-    IMAGES.contains(&file_ext.to_lowercase().as_str())
+#[derive(Debug, Clone)]
+pub enum Format {
+    JPG,
+    AVIF,
+    BMP,
+    GIF,
+    PNG,
+    QOI,
+    TGA,
+    TIFF,
+    WEBP,
 }
 
-pub fn create_app_buttons(vbox: &gtk::Box, input_file: String) -> Result<(), Error> {
-    println!("Creating buttons");
-    for i in 0..IMAGES.len() {
-        let button_label = format!("Convert to .{}", IMAGES[i]);
-        let button = gtk::Button::builder().label(&button_label).margin_bottom(12).build();
-        let input = input_file.clone();
-        let vbox_clone = vbox.clone();
-        button.connect_clicked(move |_| {
-            if let Err(_) = convert_image(input.clone(), &format!(".{}", IMAGES[i])){
-                let label = gtk::Label::builder().label("Error Saving Image").build();
-                vbox_clone.append(&label);
-            } else {
-                std::process::exit(0);
-            }
-        });
-        vbox.append(&button);
+impl Format {
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Format::JPG => ".jpg",
+            Format::AVIF => ".avif",
+            Format::BMP => ".bmp",
+            Format::GIF => ".gif",
+            Format::PNG => ".png",
+            Format::QOI => ".qoi",
+            Format::TGA => ".tga",
+            Format::TIFF => ".tiff",
+            Format::WEBP => ".webp",
+        }
     }
-    Ok(())
+
+    pub fn from_str(format: &str) -> Option<Format> {
+        match format {
+            "jpg" => Some(Format::JPG),
+            "avif" => Some(Format::AVIF),
+            "bmp" => Some(Format::BMP),
+            "gif" => Some(Format::GIF),
+            "png" => Some(Format::PNG),
+            "qoi" => Some(Format::QOI),
+            "tga" => Some(Format::TGA),
+            "tiff" => Some(Format::TIFF),
+            "webp" => Some(Format::WEBP),
+            _ => None,
+        }
+    }
+
+    pub fn values() -> Vec<Format> {
+        vec![
+            Format::JPG,
+            Format::AVIF,
+            Format::BMP,
+            Format::GIF,
+            Format::PNG,
+            Format::QOI,
+            Format::TGA,
+            Format::TIFF,
+            Format::WEBP,
+        ]
+    }
 }
 
-fn convert_image(input_file: String, ext: &str) -> Result<(), Error>{
+pub fn is_image_extension(file_ext: &String) -> bool {
+    let format = Format::from_str(file_ext);
+    match format {
+        Some(_) => true,
+        None => false,
+    }
+}
+
+pub fn convert_image(input_file: String, ext: &str) -> Result<(), Error> {
     // Get the name of the image file
     println!("Converting image");
     let new_file_path: &str = input_file.split(".").collect::<Vec<&str>>()[0];
@@ -51,13 +76,23 @@ fn convert_image(input_file: String, ext: &str) -> Result<(), Error>{
     // Open the image file
     match image::open(&input_file) {
         Ok(img) => {
-            let img = img.to_rgba8();
+            let img = img.to_rgb8();
             // Save the image file with required extension
             match img.save(new_path) {
                 Ok(_) => return Ok(()),
-                Err(e) => {return Err(Error::new(std::io::ErrorKind::Other, "Error reading image file"));}
+                Err(e) => {
+                    return Err(Error::new(
+                        std::io::ErrorKind::Other,
+                        format!("Error reading image file {}\n{}", input_file, e),
+                    ));
+                }
             }
         }
-        Err(e) => {return Err(Error::new(std::io::ErrorKind::Other, "Error opening image file"));}
+        Err(e) => {
+            return Err(Error::new(
+                std::io::ErrorKind::Other,
+                format!("Error opening image file: {}\n{}", input_file, e),
+            ));
+        }
     };
 }

@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-gtk4 = "0.8.2"
 image = "0.25.1"
+iced = "0.12.1"
 
 [profile.release]
 # Do not open a console when the program is run
