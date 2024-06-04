@@ -5,10 +5,7 @@ edition = "2021"
 
 [dependencies]
 image = "0.25.1"
-
-[dependencies.iced]
-git = "https://github.com/iced-rs/iced.git"
-rev = "cdb18e610a72b4a025d7e1890140393adee5b087"
+iced = "0.12.1"
 
 [profile.release]
 # Do not open a console when the program is run

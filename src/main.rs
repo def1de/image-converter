@@ -3,7 +3,9 @@
 mod img_manager;
 use img_manager::{convert_image, is_image_extension, Format};
 
-use iced::widget::{button, column, text, Column};
+use iced::executor;
+use iced::{Application, Command, Element, Settings, Theme};
+use iced::widget::{button, text, Column, Container};
 
 #[derive(Debug, Clone)]
 struct App {
@@ -11,26 +13,46 @@ struct App {
     file: File,
 }
 
-impl App {
-    fn view(&self) -> Column<Format> {
+impl Application for App{
+    type Executor = executor::Default;
+    type Flags = ();
+    type Message = Format;
+    type Theme = Theme;
+
+    fn new(_flags: ()) -> (App, Command<Self::Message>) {
+        (App {
+            result: String::new(),
+            file: get_file_path(),
+        }, Command::none())
+    }
+
+    fn title(&self) -> String {
+        String::from("A cool application")
+    }
+
+    fn view(&self) -> Element<Self::Message> {
+        let mut column = Column::new();
+
         let title = text("Choose a file extention");
-        let mut btn_col = column![];
+        column = column.push(title);
+        
         for format in Format::values() {
             let btn = button(format.as_str()).on_press(format);
-            btn_col = btn_col.push(btn);
+            column = column.push(btn);
         }
 
         let debug = text(&self.result);
-
-        let interface = column![title, btn_col, debug];
-        interface
+        column = column.push(debug);
+        
+        let element: Element<_, _> = Container::new(column).into();
+        element
     }
 
-    fn update(&mut self, format: Format) {
+    fn update(&mut self, format: Self::Message) -> Command<Self::Message> {
         self.file = get_file_path();
         if !is_image_extension(&self.file.ext) {
             self.result = "Invalid file extension".to_string();
-            return;
+            return Command::none();
         }
         match convert_image(self.file.path.clone(), format.as_str()) {
             Ok(_) => {
@@ -40,6 +62,7 @@ impl App {
                 self.result = format!("Error converting image: {}", e);
             }
         }
+        Command::none()
     }
 }
 
@@ -89,10 +112,10 @@ fn get_file_path() -> File {
     };
 }
 
-fn app() -> iced::Result {
-    iced::run("A Cool Title", App::update, App::view)
+fn start_app() -> iced::Result {
+    App::run(Settings::default())
 }
 
 fn main() {
-    let _ = app();
+    let _ = start_app();
 }
