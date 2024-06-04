@@ -6,12 +6,12 @@ use img_manager::{convert_image, is_image_extension, Format};
 use iced::widget::{button, column, text, Column};
 
 #[derive(Debug, Clone)]
-struct Converter {
+struct App {
     result: String,
     file: File,
 }
 
-impl Converter {
+impl App {
     fn view(&self) -> Column<Format> {
         let title = text("Choose a file extention");
         let mut btn_col = column![];
@@ -43,9 +43,9 @@ impl Converter {
     }
 }
 
-impl Default for Converter {
+impl Default for App {
     fn default() -> Self {
-        Converter {
+        App {
             result: String::new(),
             file: File {
                 path: String::new(),
@@ -90,7 +90,7 @@ fn get_file_path() -> File {
 }
 
 fn app() -> iced::Result {
-    iced::run("A Cool Title", Converter::update, Converter::view)
+    iced::run("A Cool Title", App::update, App::view)
 }
 
 fn main() {
