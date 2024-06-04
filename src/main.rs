@@ -1,11 +1,17 @@
 #![windows_subsystem = "windows"]
+#![allow(unused)]
+
+mod theme;
 
 mod img_manager;
+use iced::widget::shader::wgpu::naga::proc;
 use img_manager::{convert_image, is_image_extension, Format};
 
 use iced::executor;
-use iced::{Application, Command, Element, Settings, Theme};
-use iced::widget::{button, text, Column, Container};
+use iced::widget::{button, container, text, Button, Column, Container, Text};
+use iced::{window, Application, Command, Settings};
+
+pub type Element<'a> = iced::Element<'a, img_manager::Format, theme::Theme, iced::Renderer>;
 
 #[derive(Debug, Clone)]
 struct App {
@@ -13,39 +19,54 @@ struct App {
     file: File,
 }
 
-impl Application for App{
+impl Application for App {
     type Executor = executor::Default;
     type Flags = ();
     type Message = Format;
-    type Theme = Theme;
+    type Theme = theme::Theme;
 
     fn new(_flags: ()) -> (App, Command<Self::Message>) {
-        (App {
-            result: String::new(),
-            file: get_file_path(),
-        }, Command::none())
+        (
+            App {
+                result: String::new(),
+                file: get_file_path(),
+            },
+            Command::none(),
+        )
     }
 
     fn title(&self) -> String {
         String::from("A cool application")
     }
 
-    fn view(&self) -> Element<Self::Message> {
+    fn view(&self) -> Element {
         let mut column = Column::new();
 
         let title = text("Choose a file extention");
         column = column.push(title);
-        
+
         for format in Format::values() {
-            let btn = button(format.as_str()).on_press(format);
+            let btn = Button::new(
+                Text::new(format.as_str())
+                    .horizontal_alignment(iced::alignment::Horizontal::Center),
+            )
+            .on_press(format)
+            .style(theme::Button::Primary)
+            .width(100)
+            .padding(5);
             column = column.push(btn);
         }
 
         let debug = text(&self.result);
         column = column.push(debug);
-        
-        let element: Element<_, _> = Container::new(column).into();
-        element
+        column = column.align_items(iced::Alignment::Center).spacing(10);
+
+        container(column)
+            .width(iced::Length::Fill)
+            .height(iced::Length::Fill)
+            .center_x()
+            .center_y()
+            .into()
     }
 
     fn update(&mut self, format: Self::Message) -> Command<Self::Message> {
@@ -57,6 +78,7 @@ impl Application for App{
         match convert_image(self.file.path.clone(), format.as_str()) {
             Ok(_) => {
                 self.result = "Image converted successfully".to_string();
+                std::process::exit(0);
             }
             Err(e) => {
                 self.result = format!("Error converting image: {}", e);
@@ -113,7 +135,17 @@ fn get_file_path() -> File {
 }
 
 fn start_app() -> iced::Result {
-    App::run(Settings::default())
+    let settings = Settings {
+        window: window::Settings {
+            size: iced::Size::new(300.0, 500.0),
+            resizable: false,
+            decorations: false,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    App::run(settings)
 }
 
 fn main() {
