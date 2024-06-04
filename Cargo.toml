@@ -1,5 +1,5 @@
 [package]
-name = "jpg-png"
+name = "cross_convert"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,6 @@ edition = "2021"
 image = "0.25.1"
 
 [profile.release]
-# Do not open a console when the program is run
 codegen-units = 1
 opt-level = 'z'
 lto = true
