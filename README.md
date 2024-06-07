@@ -8,7 +8,7 @@
 - Open the executable and follow the steps written there
 
 ---
-## Instalation on Linux
+## Instalation on Linux/MacOS
 - Clone the repo `git clone https://github.com/def1de/image-converter.git`
 - Go in the directory `cd image-converter`
 - Compile the code `cargo build --release`
