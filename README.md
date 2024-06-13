@@ -1,5 +1,5 @@
 # image-converter
-### Allows you to convert betwwen image files extentions.
+### Allows you to convert between image files extentions.
 
 ---
 ## Installation on Windows
@@ -22,3 +22,8 @@
 ### For use from menu
 - Right click on a file you want to convert
 - Choose your desired format you want to convert into
+
+---
+## Future Features
+- Custom themes
+- Exit button
