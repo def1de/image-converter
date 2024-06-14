@@ -21,6 +21,8 @@
 - use `path/to/executable path/to/file`
 ### For use from menu
 - Right click on a file you want to convert
+- Go to Show more options
+- Select CrossConvert
 - Choose your desired format you want to convert into
 
 ---
