@@ -1,15 +1,16 @@
 #![windows_subsystem = "windows"]
 #![allow(unused)]
 
+mod img_manager;
 mod theme;
 
-mod img_manager;
 use iced::widget::shader::wgpu::naga::proc;
 use img_manager::{convert_image, is_image_extension, Format};
 
 use iced::executor;
-use iced::widget::{button, container, text, Button, Column, Container, Text};
+use iced::widget::{button, container, text, Button, Column, Container, Row, Space, Text};
 use iced::{window, Application, Command, Settings};
+use theme::Theme;
 
 pub type Element<'a> = iced::Element<'a, img_manager::Format, theme::Theme, iced::Renderer>;
 
@@ -40,13 +41,29 @@ impl Application for App {
     }
 
     fn view(&self) -> Element {
-        let mut column = Column::new();
+        let close_btn =
+            Button::new(Text::new("x").horizontal_alignment(iced::alignment::Horizontal::Center))
+                .on_press(Format::None)
+                .style(theme::Button::Close)
+                .width(35)
+                .height(35)
+                .padding(5);
 
-        let title = text("Choose a file extention");
+        let row = Row::new()
+            .push(Space::with_width(iced::Length::Fill))
+            .push(close_btn);
+
+        let mut column: Column<'_, Format, Theme> = Column::new();
+
+        let title: Text<'_, Theme, _> = text("Choose a file extention");
         column = column.push(title);
 
+        // Create a button for each format
         for format in Format::values() {
-            let btn = Button::new(
+            if format == Format::None {
+                continue;
+            }
+            let btn: Button<'_, Format, Theme, _> = Button::new(
                 Text::new(format.as_str())
                     .horizontal_alignment(iced::alignment::Horizontal::Center),
             )
@@ -57,15 +74,19 @@ impl Application for App {
             column = column.push(btn);
         }
 
-        let debug = text(&self.result);
+        let debug: Text<'_, Theme, _> = text(&self.result);
         column = column.push(debug);
         column = column.align_items(iced::Alignment::Center).spacing(10);
 
-        container(column)
+        let content = Column::new()
+            .push(row)
+            .push(column)
+            .align_items(iced::Alignment::Center);
+
+        container(content)
             .width(iced::Length::Fill)
             .height(iced::Length::Fill)
             .center_x()
-            .center_y()
             .into()
     }
 
@@ -74,6 +95,9 @@ impl Application for App {
         if !is_image_extension(&self.file.ext) {
             self.result = "Invalid file extension".to_string();
             return Command::none();
+        }
+        if format == Format::None {
+            std::process::exit(0);
         }
         match convert_image(self.file.path.clone(), format.as_str()) {
             Ok(_) => {
