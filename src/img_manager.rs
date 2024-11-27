@@ -1,7 +1,7 @@
 use image;
 use std::io::Error;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Format {
     JPG,
     AVIF,
@@ -12,6 +12,7 @@ pub enum Format {
     TGA,
     TIFF,
     WEBP,
+    None,
 }
 
 impl Format {
@@ -26,6 +27,7 @@ impl Format {
             Format::TGA => ".tga",
             Format::TIFF => ".tiff",
             Format::WEBP => ".webp",
+            Format::None => "",
         }
     }
 
@@ -55,6 +57,7 @@ impl Format {
             Format::TGA,
             Format::TIFF,
             Format::WEBP,
+            Format::None,
         ]
     }
 }

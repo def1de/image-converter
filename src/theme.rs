@@ -33,6 +33,7 @@ pub struct Theme {
 
     background: Color,
     primary: Color,
+    close: Color,
 }
 
 impl Theme {
@@ -42,6 +43,7 @@ impl Theme {
 
         background: color!(61, 49, 74),
         primary: color!(61, 125, 74, 255),
+        close: color!(173, 0, 0, 255),
     };
 }
 
@@ -74,6 +76,7 @@ impl application::StyleSheet for Theme {
 pub enum Button {
     #[default]
     Primary,
+    Close,
 }
 
 impl button::StyleSheet for Theme {
@@ -88,6 +91,7 @@ impl button::StyleSheet for Theme {
 
         match style {
             Button::Primary => auto_fill(self.primary, self.text),
+            Button::Close => auto_fill(self.close, self.text),
         }
     }
 
