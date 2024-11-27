@@ -37,7 +37,7 @@ impl Application for App {
     }
 
     fn title(&self) -> String {
-        String::from("A cool application")
+        String::from("Cross Convert")
     }
 
     fn view(&self) -> Element {
