@@ -1,5 +1,11 @@
 # image-converter
 ### Allows you to convert between image files extentions.
+Have you aver downloaded a picture from the internet in some weird fromat, like `.webp`? What's next? Typical way of dealing with it involves a visit to an image conversion web-site, with lots of ads and a queue.
+On average process of converting the image this traditional way takes up to 2 minutes.
+Luckly for you, **Cross Convert** is a free and open-source crossplatform tool that allows you to convert an image in 3 clicks, or around 10 seconds (x12 faster).
+This localy hosted software has no queues or annoying ads. Built for convinience, optimised for performance, **Cross Convert** changes your images to desired extensions in a matter of seconds.
+
+[Watch the demo](https://youtu.be/pIJC74hbxrY)
 
 ---
 ## Installation on Windows
@@ -28,4 +34,3 @@
 ---
 ## Future Features
 - Custom themes
-- Exit button
